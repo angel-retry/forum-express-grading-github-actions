@@ -1,4 +1,3 @@
-const { raw } = require('express')
 const { User } = require('../models')
 const bcrypt = require('bcryptjs')
 
@@ -26,6 +25,18 @@ const userController = {
         res.redirect('/signin')
       })
       .catch(err => next(err))
+  },
+  signInPage: (req, res) => {
+    return res.render('signin')
+  },
+  signIn: (req, res) => {
+    req.flash('success_messages', '登入成功!')
+    res.redirect('/restaurants')
+  },
+  logout: (req, res) => {
+    req.flash('success_messages', '登出成功!')
+    req.logout()
+    res.redirect('/signin')
   }
 }
 
