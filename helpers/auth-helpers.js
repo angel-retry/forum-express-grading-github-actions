@@ -4,6 +4,12 @@ const getUser = req => {
   return req.user || null
 }
 
+// 宣告ensureAuthenticated接收參數，回傳此使用者已有登入過
+const ensureAuthenticated = req => {
+  return req.isAuthenticated()
+}
+
 module.exports = {
-  getUser
+  getUser,
+  ensureAuthenticated
 }
