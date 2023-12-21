@@ -1,4 +1,5 @@
 const { Restaurant } = require('../models')
+const { localFileHandler } = require('../helpers/file-helpers')
 
 const adminController = {
   getRestaurants: (req, res, next) => {
@@ -16,13 +17,20 @@ const adminController = {
   postRestaurant: (req, res, next) => {
     const { name, tel, address, openingHours, description } = req.body
     if (!name) throw new Error('請輸入餐廳名字!')
-    Restaurant.create({
-      name,
-      tel,
-      address,
-      openingHours,
-      description
-    })
+    // file從req取出
+    const { file } = req
+    // 取出檔案交給file-helpers處理會提供圖片檔路徑(filePath)
+    localFileHandler(file)
+      .then(filePath => {
+        return Restaurant.create({
+          name,
+          tel,
+          address,
+          openingHours,
+          description,
+          image: filePath || null
+        })
+      })
       .then(() => {
         req.flash('success_messages', '新增成功!')
         res.redirect('/admin/restaurants')
@@ -55,15 +63,22 @@ const adminController = {
     const { name, tel, address, openingHours, description } = req.body
     const id = req.params.id
     if (!name) throw new Error('請輸入餐廳名字!')
-    Restaurant.findByPk(id) // 更新用物件實例就好，不需要取出單純資料
-      .then(restaurant => {
+    const { file } = req
+    // 非同步處理
+    Promise.all([
+      Restaurant.findByPk(id),
+      localFileHandler(file)
+    ])
+      // 更新用物件實例就好，不需要取出單純資料
+      .then(([restaurant, filePath]) => {
         if (!restaurant) throw new Error('沒有此餐廳資料喔!')
         return restaurant.update({
           name,
           tel,
           address,
           openingHours,
-          description
+          description,
+          image: filePath || restaurant.image
         })
       })
       .then(() => {

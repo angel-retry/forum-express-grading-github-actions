@@ -7,6 +7,7 @@ const passport = require('passport')
 const { getUser } = require('./helpers/auth-helpers')
 const handlebarsHelpers = require('./helpers/handlebars-helpers')
 const methodOverride = require('method-override')
+const path = require('path')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -20,6 +21,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(flash())
 app.use(methodOverride('_method'))
+app.use('/upload', express.static(path.join(__dirname, '/upload'))) // express.static 接收參數為該文件的根目錄，會返回一個中間件函數，其中path.join(__dirname, '/upload')意思是在/upload路徑查找
 app.use((req, res, next) => {
   res.locals.success_messages = req.flash('success_messages')
   res.locals.error_messages = req.flash('error_messages')
