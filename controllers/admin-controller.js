@@ -1,10 +1,12 @@
-const { Restaurant, User } = require('../models')
+const { Restaurant, User, Category } = require('../models')
 const { localFileHandler } = require('../helpers/file-helpers')
 
 const adminController = {
   getRestaurants: (req, res, next) => {
     Restaurant.findAll({
-      raw: true
+      raw: true,
+      nest: true, // 與raw同理，取得單純的關聯資料，沒加上時會變成restaurants[Category.name]
+      include: [Category] // 要用到Restaurant的關聯資料時要加上include:[modelName]
     })
       .then(restaurants => {
         return res.render('admin/restaurants', { restaurants })
@@ -40,7 +42,9 @@ const adminController = {
   getRestaurant: (req, res, next) => {
     const id = req.params.id
     Restaurant.findByPk(id, {
-      raw: true
+      raw: true,
+      nest: true,
+      include: [Category]
     })
       .then(restaurant => {
         if (!restaurant) throw new Error('沒有此餐廳資料喔!')
