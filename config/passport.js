@@ -31,7 +31,6 @@ passport.deserializeUser((id, cb) => {
   User.findByPk(id)
     .then(user => {
       user = user.toJSON() // 利用toJSON()把user物件格式處理好，資料就可以方便取用
-      console.log(user)
       return cb(null, user)
     })
 })
