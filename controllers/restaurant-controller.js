@@ -21,12 +21,26 @@ const restController = {
   getRestaurant: (req, res, next) => {
     const { id } = req.params
     return Restaurant.findByPk(id, {
-      include: Category,
-      nest: true,
-      raw: true
+      include: Category
     })
       .then(restaurant => {
-        return res.render('restaurant', { restaurant })
+        if (!restaurant) throw new Error('沒有此餐廳')
+        return restaurant.increment('viewCounts')
+      })
+      .then((restaurant) => {
+        res.render('restaurant', { restaurant: restaurant.toJSON() })
+      })
+      .catch(err => next(err))
+  },
+  getDashboard: (req, res, next) => {
+    const { id } = req.params
+    return Restaurant.findByPk(id, {
+      raw: true,
+      include: Category,
+      nest: true
+    })
+      .then(restaurant => {
+        return res.render('dashboard', { restaurant })
       })
       .catch(err => next(err))
   }
