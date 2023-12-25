@@ -17,6 +17,18 @@ const restController = {
         }))
         return res.render('restaurants', { restaurants: data })
       })
+  },
+  getRestaurant: (req, res, next) => {
+    const { id } = req.params
+    return Restaurant.findByPk(id, {
+      include: Category,
+      nest: true,
+      raw: true
+    })
+      .then(restaurant => {
+        return res.render('restaurant', { restaurant })
+      })
+      .catch(err => next(err))
   }
 }
 

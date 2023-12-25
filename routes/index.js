@@ -8,7 +8,11 @@ const passport = require('../config/passport')
 const { authenticated, authenticatedAdmin } = require('../middleware/auth')
 
 router.use('/admin', authenticatedAdmin, admin)
+
+router.get('/restaurants/:id', authenticated, restController.getRestaurant)
 router.get('/restaurants', authenticated, restController.getRestaurants)
+
+router.get('/logout', userController.logout)
 router.get('/signup', userController.signUpPage)
 router.post('/signup', userController.signUp)
 router.get('/signin', userController.signInPage)
