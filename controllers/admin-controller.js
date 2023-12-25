@@ -13,11 +13,15 @@ const adminController = {
       })
       .catch(err => next(err))
   },
-  createRestaurant: (req, res) => {
-    return res.render('admin/create-restaurant')
+  createRestaurant: (req, res, next) => {
+    Category.findAll({ raw: true })
+      .then(categories => {
+        return res.render('admin/create-restaurant', { categories })
+      })
+      .catch(err => next(err))
   },
   postRestaurant: (req, res, next) => {
-    const { name, tel, address, openingHours, description } = req.body
+    const { name, tel, address, openingHours, description, categoryId } = req.body
     if (!name) throw new Error('請輸入餐廳名字!')
     // file從req取出
     const { file } = req
@@ -30,7 +34,8 @@ const adminController = {
           address,
           openingHours,
           description,
-          image: filePath || null
+          image: filePath || null,
+          categoryId
         })
       })
       .then(() => {
@@ -54,17 +59,18 @@ const adminController = {
   },
   editRestaurant: (req, res, next) => {
     const id = req.params.id
-    Restaurant.findByPk(id, {
-      raw: true
-    })
-      .then(restaurant => {
+    Promise.all([
+      Restaurant.findByPk(id, { raw: true }),
+      Category.findAll({ raw: true })
+    ])
+      .then(([restaurant, categories]) => {
         if (!restaurant) throw new Error('沒有此餐廳資料喔!')
-        res.render('admin/edit-restaurant', { restaurant })
+        res.render('admin/edit-restaurant', { restaurant, categories })
       })
       .catch(err => next(err))
   },
   putRestaurant: (req, res, next) => {
-    const { name, tel, address, openingHours, description } = req.body
+    const { name, tel, address, openingHours, description, categoryId } = req.body
     const id = req.params.id
     if (!name) throw new Error('請輸入餐廳名字!')
     const { file } = req
@@ -82,7 +88,8 @@ const adminController = {
           address,
           openingHours,
           description,
-          image: filePath || restaurant.image
+          image: filePath || restaurant.image,
+          categoryId
         })
       })
       .then(() => {
