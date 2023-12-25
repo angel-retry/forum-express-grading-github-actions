@@ -1,13 +1,14 @@
 {{> admin-tabs route='categories'}}
-<form action="/admin/categories" method="post" class="input-group">
-  <div class="raw d-flex">
-    <input type="text" class="form-control col-1 me-3" name="category" placeholder="Category Name">
-    <button class="btn btn-success" type="submit">
-      Submit
-    </button>
-  </div>
-</form>
-<br />
+<div class="d-flex align-items-center pt-3 pb-5 my-3 text-white-50 bg-purple">
+  <form class="row" action="/admin/categories" method="POST">
+    <div class="col-auto">
+      <input class="form-control" type="text" placeholder="Category Name" name="name">
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-success" type="submit">Create</button>
+    </div>
+  </form>
+</div>
 <table class="table align-middle">
   <thead class="table-dark">
     <tr>

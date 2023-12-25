@@ -21,10 +21,10 @@ const categoryController = {
       .catch(err => next(err))
   },
   postCategory: (req, res, next) => {
-    const { category } = req.body
-    if (!category) throw new Error('請輸入分類名稱!')
+    const { name } = req.body
+    if (!name) throw new Error('請輸入分類名稱!')
     return Category.create({
-      name: category
+      name
     })
       .then(() => {
         req.flash('success_messages', '成功新增分類!')
