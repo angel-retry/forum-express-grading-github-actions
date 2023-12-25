@@ -4,19 +4,13 @@ const categoryController = {
   getCategories: (req, res, next) => {
     const { id } = req.params
 
-    if (!id) {
-      return Category.findAll({ raw: true })
-        .then(categories => {
-          return res.render('admin/categories', { categories })
-        })
-    }
-
     return Promise.all([
-      Category.findByPk(id, { raw: true }),
-      Category.findAll({ raw: true })
+      Category.findAll({ raw: true }),
+      // 判斷是否有id，如果沒有傳null即可
+      id ? Category.findByPk(id, { raw: true }) : null
     ])
-      .then(([category, categories]) => {
-        return res.render('admin/category', { category, categories })
+      .then(([categories, category]) => {
+        res.render('admin/categories', { categories, category })
       })
       .catch(err => next(err))
   },
@@ -33,7 +27,7 @@ const categoryController = {
       .catch(err => next(err))
   },
   putCategory: (req, res, next) => {
-    const name = req.body.category
+    const { name } = req.body
     const { id } = req.params
     if (!name) throw new Error('請輸入分類名稱!')
     return Category.findByPk(id)
