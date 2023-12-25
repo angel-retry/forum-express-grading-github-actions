@@ -1,6 +1,22 @@
+const { Restaurant, Category } = require('../models')
+
 const restController = {
   getRestaurants: (req, res) => {
-    return res.render('restaurants')
+    return Restaurant.findAll({
+      include: Category,
+      nest: true,
+      raw: true
+    })
+      .then(restaurants => {
+        // restaurants為陣列，要調整裡面內容要用map修改
+        const data = restaurants.map(r => ({
+          ...r, // 把r資料展開，...為展開運算子
+          // 展開運算子後面如果有相同的key(屬性)，會以後面的為準
+          // 把restaurants當中的description修改為50字以內
+          description: r.description.substring(0, 50) // substring(index, index)可指定擷取幾字元至幾字元
+        }))
+        return res.render('restaurants', { restaurants: data })
+      })
   }
 }
 
