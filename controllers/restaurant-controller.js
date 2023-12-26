@@ -2,12 +2,20 @@ const { Restaurant, Category } = require('../models')
 
 const restController = {
   getRestaurants: (req, res) => {
-    return Restaurant.findAll({
-      include: Category,
-      nest: true,
-      raw: true
-    })
-      .then(restaurants => {
+    // 先從網址上拿取參數categortId，再換成Number型態
+    const categoryId = Number(req.query.categoryId) || '' // 有拿取categoryId或是空字串
+    console.log('categoryId', categoryId)
+    Promise.all([
+      Restaurant.findAll({
+        include: Category,
+        nest: true,
+        raw: true,
+        where: { ...categoryId ? { categoryId } : {} } // 運用三元運算子判斷，回傳{categoryId}or{}然後接觸展開運算子變成...{categoryId} or ...{} ，...{categoryId} = categoryId: categoryId
+      }),
+      Category.findAll({ raw: true })
+    ])
+
+      .then(([restaurants, categories]) => {
         // restaurants為陣列，要調整裡面內容要用map修改
         const data = restaurants.map(r => ({
           ...r, // 把r資料展開，...為展開運算子
@@ -15,7 +23,7 @@ const restController = {
           // 把restaurants當中的description修改為50字以內
           description: r.description.substring(0, 50) // substring(index, index)可指定擷取幾字元至幾字元
         }))
-        return res.render('restaurants', { restaurants: data })
+        return res.render('restaurants', { restaurants: data, categories, categoryId }) // categoryId要拿回前面給ifCond用
       })
   },
   getRestaurant: (req, res, next) => {
