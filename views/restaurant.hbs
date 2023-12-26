@@ -26,4 +26,15 @@
   </div>
   <hr>
 </div>
-<a class="btn btn-outline-secondary" href="javascript:history.back()">Back</a>
+
+{{!-- Comment --}}
+<form action="/comments" method="post">
+  <div class="form-row mb-3">
+    <label class="form-label" for="text"> 留下評論:</label>
+    <textarea class="form-control" name="text" id="text" rows="3"></textarea>
+  </div>
+  {{!-- 要傳輸restaurantId，會運用到 --}}
+  <input type="hidden" name="restaurantId" value="{{restaurant.id}}">
+  <button type="submit" class="btn btn-primary">Submit</button>
+  <a class="btn btn-outline-secondary" href="javascript:history.back()">Back</a>
+</form>
