@@ -1,4 +1,4 @@
-const { Restaurant, Category } = require('../models')
+const { Restaurant, Category, User, Comment } = require('../models')
 const { getOffset, getPagination } = require('../helpers/pagination-helper')
 
 const restController = {
@@ -42,7 +42,11 @@ const restController = {
   getRestaurant: (req, res, next) => {
     const { id } = req.params
     return Restaurant.findByPk(id, {
-      include: Category
+      include: [
+        Category, // 與category關聯(categoryId在R這)
+        { model: Comment, include: User } // 與Comment關聯，再從Comment關連到User，前面接上modeL的後面使用到時要以tableName表示(Comments)
+        // Rid在C那裡，所以要加上{model:C}，關連到C後，C有Uid直接用U即可
+      ]
     })
       .then(restaurant => {
         if (!restaurant) throw new Error('沒有此餐廳')

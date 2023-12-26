@@ -23,6 +23,19 @@ const CommentController = {
         res.redirect(`/restaurants/${restaurantId}`)
       })
       .catch(err => next(err))
+  },
+  deleteComment: (req, res, next) => {
+    const { id } = req.params
+    return Comment.findByPk(id)
+      .then(comment => {
+        if (!comment) throw new Error('沒有此評論!')
+        return comment.destroy()
+      })
+      .then(() => {
+        req.flash('success_messages', '評論刪除成功!')
+        res.redirect(`/restaurants/${id}`)
+      })
+      .catch(err => next(err))
   }
 }
 
