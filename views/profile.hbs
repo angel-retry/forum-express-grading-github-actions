@@ -8,7 +8,11 @@
       <div class="m-5">
         <p class="fw-bold fs-5">{{user.name}}</p>
         <p>{{user.email}}</p>
+        <form action="/users/{{user.id}}/edit" method="get">
+          <button type="submit" class="btn btn-primary">Edit</button>
+        </form>
       </div>
     </div>
+
   </div>
 </div>

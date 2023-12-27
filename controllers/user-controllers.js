@@ -45,6 +45,14 @@ const userController = {
         res.render('profile', { user })
       })
       .catch(err => next(err))
+  },
+  editUser: (req, res, next) => {
+    const { id } = req.params
+    return User.findByPk(id, { raw: true })
+      .then(user => {
+        res.render('edit-profile', { user })
+      })
+      .catch(err => next(err))
   }
 }
 
