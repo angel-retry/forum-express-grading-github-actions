@@ -1,6 +1,6 @@
 const passport = require('passport')
 const LocalStrategy = require('passport-local')
-const { User } = require('../models')
+const { User, Restaurant } = require('../models')
 const bcrypt = require('bcryptjs')
 
 passport.use(new LocalStrategy({
@@ -28,11 +28,11 @@ passport.serializeUser((user, cb) => {
 
 // 反序列化，可用user.id找回原本user的全部資料
 passport.deserializeUser((id, cb) => {
-  User.findByPk(id)
-    .then(user => {
-      user = user.toJSON() // 利用toJSON()把user物件格式處理好，資料就可以方便取用
-      return cb(null, user)
-    })
+  User.findByPk(id, {
+    include: [{ model: Restaurant, as: 'FavoritedRestaurants' }] // **可以在passport就撈出使用者收藏過的餐廳
+  })
+    .then(user => cb(null, user.toJSON())) // 利用toJSON()把user物件格式處理好，資料就可以方便取用
+    .catch(err => cb(err))
 })
 
 module.exports = passport

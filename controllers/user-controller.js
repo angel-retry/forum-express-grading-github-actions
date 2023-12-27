@@ -105,7 +105,7 @@ const userController = {
       })
       .then(() => {
         req.flash('success_messages', '成功加到最愛!')
-        res.redirect('/restaurants')
+        res.redirect('back')
       })
       .catch(err => next(err))
   },
@@ -124,7 +124,7 @@ const userController = {
       })
       .then(() => {
         req.flash('success_messages', '已移除掉我的最愛!')
-        res.redirect('/restaurants')
+        res.redirect('back')
       })
       .catch(err => next(err))
   }
