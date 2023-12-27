@@ -1,6 +1,5 @@
 const { User } = require('../models')
 const bcrypt = require('bcryptjs')
-const { localFileHandler } = require('../helpers/file-helpers')
 
 const userController = {
   signUpPage: (req, res) => {
@@ -38,44 +37,6 @@ const userController = {
     req.flash('success_messages', '登出成功!')
     req.logout()
     res.redirect('/signin')
-  },
-  getUser: (req, res, next) => {
-    const { id } = req.params
-    return User.findByPk(id, { raw: true })
-      .then(user => {
-        res.render('users/profile', { user })
-      })
-      .catch(err => next(err))
-  },
-  editUser: (req, res, next) => {
-    const { id } = req.params
-    return User.findByPk(id, { raw: true })
-      .then(user => {
-        res.render('users/edit', { user })
-      })
-      .catch(err => next(err))
-  },
-  putUser: (req, res, next) => {
-    const { name } = req.body
-    const { id } = req.params
-    const { file } = req
-    if (!name) throw new Error('請輸入名字!')
-    return Promise.all([
-      User.findByPk(id),
-      localFileHandler(file)
-    ])
-      .then(([user, filePath]) => {
-        if (!user) throw new Error('沒有此使用者!')
-        return user.update({
-          name,
-          image: filePath || user.image
-        })
-      })
-      .then(() => {
-        req.flash('success_messages', '使用者資料編輯成功')
-        res.redirect(`/users/${id}`)
-      })
-      .catch(err => next(err))
   }
 }
 
