@@ -7,6 +7,7 @@ const userController = require('../controllers/user-controllers')
 const { generalErrorHandler } = require('../middleware/error-handler')
 const passport = require('../config/passport')
 const { authenticated, authenticatedAdmin } = require('../middleware/auth')
+const upload = require('../middleware/multer')
 
 router.use('/admin', authenticatedAdmin, admin)
 
@@ -14,6 +15,7 @@ router.get('/restaurants/:id', authenticated, restController.getRestaurant)
 router.get('/restaurants/:id/dashboard', authenticated, restController.getDashboard)
 router.get('/restaurants', authenticated, restController.getRestaurants)
 
+router.put('/users/:id', upload.single('image'), userController.putUser)
 router.get('/users/:id', authenticated, userController.getUser)
 router.get('/users/:id/edit', authenticated, userController.editUser)
 
