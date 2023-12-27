@@ -29,6 +29,9 @@ router.get('/users/:id/edit', authenticated, userController.editUser)
 router.delete('/comments/:id', authenticatedAdmin, commentController.deleteComment)
 router.post('/comments', authenticated, commentController.postComment)
 
+router.post('/favorite/:restaurantId', userController.addFavorite)
+router.delete('/favorite/:restaurantId', userController.removeFavorite)
+
 // 當都沒有匹對的路徑，最後會導向此路由
 router.use('/', (req, res) => res.redirect('/restaurants'))
 // 錯誤訊息要加在最後一行

@@ -1,4 +1,4 @@
-const { User, Comment, Restaurant } = require('../models')
+const { User, Comment, Restaurant, Favorite } = require('../models')
 const bcrypt = require('bcryptjs')
 const { localFileHandler } = require('../helpers/file-helpers')
 
@@ -78,6 +78,53 @@ const userController = {
       .then(() => {
         req.flash('success_messages', '使用者資料編輯成功')
         res.redirect(`/users/${id}`)
+      })
+      .catch(err => next(err))
+  },
+  addFavorite: (req, res, next) => {
+    const { restaurantId } = req.params
+    const userId = req.user.id
+    // 加入我的最愛之前，先做防呆:1.是否有這間餐廳 2.使用者是否有重複把餐廳加到我的最愛
+    return Promise.all([
+      Restaurant.findByPk(restaurantId),
+      // Favorite利用findOne使用where查詢資料。 不用加上raw:true，因為不會用到純資料。
+      Favorite.findOne({
+        where: {
+          userId,
+          restaurantId
+        }
+      })
+    ])
+      .then(([restaurant, favorite]) => {
+        if (!restaurant) throw new Error('沒有此餐廳!')
+        if (favorite) throw new Error('已經加到最愛餐廳了!')
+        return Favorite.create({
+          userId,
+          restaurantId
+        })
+      })
+      .then(() => {
+        req.flash('success_messages', '成功加到最愛!')
+        res.redirect('/restaurants')
+      })
+      .catch(err => next(err))
+  },
+  removeFavorite: (req, res, next) => {
+    const { restaurantId } = req.params
+    const userId = req.user.id
+    return Favorite.findOne({
+      where: {
+        restaurantId,
+        userId
+      }
+    })
+      .then(favorite => {
+        if (!favorite) throw new Error('沒有將此餐廳加到我的最愛!無法移除!')
+        return favorite.destroy()
+      })
+      .then(() => {
+        req.flash('success_messages', '已移除掉我的最愛!')
+        res.redirect('/restaurants')
       })
       .catch(err => next(err))
   }
