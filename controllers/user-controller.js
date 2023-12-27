@@ -43,7 +43,7 @@ const userController = {
     const { id } = req.params
     return User.findByPk(id, { raw: true })
       .then(user => {
-        res.render('profile', { user })
+        res.render('users/profile', { user })
       })
       .catch(err => next(err))
   },
@@ -51,7 +51,7 @@ const userController = {
     const { id } = req.params
     return User.findByPk(id, { raw: true })
       .then(user => {
-        res.render('edit-profile', { user })
+        res.render('users/edit', { user })
       })
       .catch(err => next(err))
   },
@@ -72,7 +72,7 @@ const userController = {
         })
       })
       .then(() => {
-        req.flash('success_messages', '資料更新成功!')
+        req.flash('success_messages', '使用者資料編輯成功')
         res.redirect(`/users/${id}`)
       })
       .catch(err => next(err))
