@@ -1,5 +1,5 @@
-<div class=" d-flex justify-content-center">
-  <div class="raw d-flex bg-white col-8 ">
+<div class="d-flex row justify-content-center">
+  <div class="raw d-flex bg-white col-8 p-0">
     <div class="col-auto">
       <img src="{{user.image}}" alt="user image" style="width: 300px; transition: opacity 0.5s; opacity:0;"
         onload="this.style.opacity=1;">
@@ -8,6 +8,7 @@
       <div class="m-5">
         <p class="fw-bold fs-5">{{user.name}}</p>
         <p>{{user.email}}</p>
+        <p class="fw-semibold">{{#if userCommentsLenght }}{{userCommentsLenght}}間已評論過的餐廳{{else}}目前沒評論過餐廳。{{/if}}</p>
         <form action="/users/{{user.id}}/edit" method="get">
           <button type="submit" class="btn btn-primary">Edit</button>
         </form>
@@ -15,4 +16,18 @@
     </div>
 
   </div>
+  <div class="col-8 p-0 mt-5">
+    <div class="card p-0">
+      <div class="card-header">
+        5間已評論過的餐廳
+      </div>
+      <ul class="list-group list-group-flush">
+        {{#each user.Comments.Restaurant}}
+        <li class="list-group-item"><img src="{{this.image}}" alt=""></li>
+        {{/each}}
+      </ul>
+    </div>
+
+  </div>
+
 </div>

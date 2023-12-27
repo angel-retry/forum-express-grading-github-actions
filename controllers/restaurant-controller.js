@@ -10,7 +10,6 @@ const restController = {
 
     // 先從網址上拿取參數categortId，再換成Number型態
     const categoryId = Number(req.query.categoryId) || '' // 有拿取categoryId或是空字串
-    console.log('categoryId', categoryId)
     Promise.all([
       Restaurant.findAndCountAll({
         include: Category,
@@ -44,7 +43,7 @@ const restController = {
     return Restaurant.findByPk(id, {
       include: [
         Category, // 與category關聯(categoryId在R這)
-        { model: Comment, include: User } // 與Comment關聯，再從Comment關連到User，前面接上modeL的後面使用到時要以tableName表示(Comments)
+        { model: Comment, include: User } // 與Comment關聯，再從Comment關連到User
         // Rid在C那裡，所以要加上{model:C}，關連到C後，C有Uid直接用U即可
       ]
     })
@@ -66,6 +65,28 @@ const restController = {
     })
       .then(restaurant => {
         return res.render('dashboard', { restaurant })
+      })
+      .catch(err => next(err))
+  },
+  getFeeds: (req, res, next) => {
+    return Promise.all([
+      Restaurant.findAll({
+        include: Category,
+        nest: true,
+        raw: true,
+        order: [['createdAt', 'DESC']], // order指定排序，'指定欄位'、'排序方式'，可新增其他排序方式所以用陣列來表示
+        limit: 10 // 只要10筆資料即可
+      }),
+      Comment.findAll({
+        include: [Restaurant, User],
+        nest: true,
+        order: [['createdAt', 'DESC']],
+        limit: 10,
+        raw: true
+      })
+    ])
+      .then(([restaurants, comments]) => {
+        res.render('feeds', { restaurants, comments })
       })
       .catch(err => next(err))
   }

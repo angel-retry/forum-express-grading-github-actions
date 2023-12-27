@@ -1,4 +1,4 @@
-const { User } = require('../models')
+const { User, Comment, Restaurant } = require('../models')
 const bcrypt = require('bcryptjs')
 const { localFileHandler } = require('../helpers/file-helpers')
 
@@ -41,8 +41,12 @@ const userController = {
   },
   getUser: (req, res, next) => {
     const { id } = req.params
-    return User.findByPk(id, { raw: true })
+    return User.findByPk(id, {
+      include: [{ model: Comment, include: Restaurant }]
+    })
       .then(user => {
+        if (!user) throw new Error('沒有此使用者!')
+        console.log('image', user)
         res.render('users/profile', { user })
       })
       .catch(err => next(err))
