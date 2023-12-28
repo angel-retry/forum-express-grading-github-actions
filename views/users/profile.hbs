@@ -22,16 +22,21 @@
       <div class="card-header">
         {{user.CommentedRestaurants.length}}已評論過的餐廳
       </div>
-      <ul class="list-group list-group-flush d-flex flex-row p-2">
-        {{#each user.CommentedRestaurants}}
-        <a href="/restaurants/{{this.id}}" class="m-2">
-          <img src="{{this.image}}" alt="restaurant-image"
-            style="width: 100px; height: 100px; transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1;">
-        </a>
-        {{/each}}
-      </ul>
+      <div class="card-body text-center">
+        <div class="row">
+          {{#each user.CommentedRestaurants}}
+          <div class="col-md-2 mb-3">
+            <a href="/restaurants/{{this.id}}">
+              <img class="" src="{{this.image}}" alt="user commemtedRestaurants " width="100px" height="100px"
+                style="transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1;">
+            </a>
+          </div>
+          {{/each}}
+
+        </div>
+
+      </div>
+
     </div>
 
   </div>
-
-</div>
