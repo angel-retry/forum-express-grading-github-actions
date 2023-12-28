@@ -30,8 +30,11 @@ passport.serializeUser((user, cb) => {
 passport.deserializeUser((id, cb) => {
   User.findByPk(id, {
     include: [
+      // **與user有關的關聯資料可在passport進行設定
       { model: Restaurant, as: 'FavoritedRestaurants' }, // **可以在passport就撈出使用者收藏過的餐廳
-      { model: Restaurant, as: 'LikedRestaurants' }
+      { model: Restaurant, as: 'LikedRestaurants' },
+      { model: User, as: 'Followers' },
+      { model: User, as: 'Followings' }
     ]
   })
     .then(user => cb(null, user.toJSON())) // 利用toJSON()把user物件格式處理好，資料就可以方便取用
