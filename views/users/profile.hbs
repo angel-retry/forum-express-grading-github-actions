@@ -8,7 +8,8 @@
       <div class="m-5">
         <p class="fw-bold fs-5">{{user.name}}</p>
         <p>{{user.email}}</p>
-        <p class="fw-semibold">{{#if userCommentsLenght }}{{userCommentsLenght}}間已評論過的餐廳{{else}}目前沒評論過餐廳。{{/if}}</p>
+        <p class="fw-semibold">{{#if user.CommentedRestaurants
+          }}{{user.CommentedRestaurants.length}}間已評論過的餐廳{{else}}目前沒評論過餐廳。{{/if}}</p>
         <form action="/users/{{user.id}}/edit" method="get">
           <button type="submit" class="btn btn-primary">Edit</button>
         </form>
@@ -19,11 +20,14 @@
   <div class="col-8 p-0 mt-5">
     <div class="card p-0">
       <div class="card-header">
-        5間已評論過的餐廳
+        {{user.CommentedRestaurants.length}}已評論過的餐廳
       </div>
-      <ul class="list-group list-group-flush">
-        {{#each user.Comments.Restaurant}}
-        <li class="list-group-item"><img src="{{this.image}}" alt=""></li>
+      <ul class="list-group list-group-flush d-flex flex-row p-2">
+        {{#each user.CommentedRestaurants}}
+        <a href="/restaurants/{{this.id}}" class="m-2">
+          <img src="{{this.image}}" alt="restaurant-image"
+            style="width: 100px; height: 100px; transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1;">
+        </a>
         {{/each}}
       </ul>
     </div>

@@ -57,7 +57,7 @@ const restController = {
         return restaurant.increment('viewCounts')
       })
       .then((restaurant) => {
-        console.log(restaurant.FavoritedUsers)
+        console.log('restaurant.FavoritedUsers', restaurant.FavoritedUsers)
         // 因只要查到一筆資料比對即可，所以使用some，也因為使用一筆資料，所以使用User的FavoritedUsers即可比較有效率
         const isFavorite = restaurant.FavoritedUsers.some(f => f.id === req.user.id) // some找到一筆資料即回傳true停止程式
         res.render('restaurant', {

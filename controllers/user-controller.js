@@ -46,7 +46,10 @@ const userController = {
     })
       .then(user => {
         if (!user) throw new Error('沒有此使用者!')
-        console.log('image', user)
+        // 把資料toJSON()化
+        user = user.toJSON()
+        // 新增user屬性CommentedRestaurants存放餐廳資訊
+        user.CommentedRestaurants = user.Comments && user.Comments.map(c => c.Restaurant)
         res.render('users/profile', { user })
       })
       .catch(err => next(err))
