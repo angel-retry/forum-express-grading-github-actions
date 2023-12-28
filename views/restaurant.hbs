@@ -17,12 +17,6 @@
   </div>
   <div class="col-md-8">
     <p style="white-space: break-spaces;">{{restaurant.description}}</p>
-
-    <form action="/restaurants/{{restaurant.id}}/dashboard" method="get">
-      <button class="btn btn-primary" type="submit">
-        Dashboard
-      </button>
-    </form>
     <div class="d-flex">
       {{#if isFavorite}}
       <form action="/favorite/{{restaurant.id}}?_method=DELETE" method="post">
@@ -37,6 +31,24 @@
         </button>
       </form>
       {{/if}}
+      {{#if isLike}}
+      <form action="/like/{{restaurant.id}}?_method=DELETE" method="post">
+        <button class="btn btn-danger m-1" type="submit">
+          unLike
+        </button>
+      </form>
+      {{else}}
+      <form action="/like/{{restaurant.id}}" method="post">
+        <button class="btn btn-success m-1" type="submit">
+          Like
+        </button>
+      </form>
+      {{/if}}
+      <form action="/restaurants/{{restaurant.id}}/dashboard" method="get">
+        <button class="btn btn-primary m-1" type="submit">
+          Dashboard
+        </button>
+      </form>
     </div>
   </div>
   <hr>

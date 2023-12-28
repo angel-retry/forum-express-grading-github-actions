@@ -25,6 +25,7 @@ const restController = {
       .then(([restaurants, categories]) => {
         // req.user.FavoritedRestaurants為陣列資料，將此陣列改為只存放id陣列，已可與餐廳id做比對
         const favoritedRestaurantId = req.user && req.user.FavoritedRestaurants.map(fs => fs.id)
+        const LikedRestaurantId = req.user && req.user.LikedRestaurants.map(lr => lr.id)
         // restaurants為陣列，要調整裡面內容要用map修改
         const data = restaurants.rows.map(r => ({
           ...r, // 把r資料展開，...為展開運算子
@@ -32,7 +33,8 @@ const restController = {
           // 把restaurants當中的description修改為50字以內
           description: r.description.substring(0, 50), // substring(index, index)可指定擷取幾字元至幾字元
           // 使用者已收藏餐廳的id與餐廳id做比對，回傳boolean值，以便於views利用
-          isFavorite: favoritedRestaurantId.includes(r.id) // include會回傳boolean陣列
+          isFavorite: favoritedRestaurantId.includes(r.id), // include會回傳boolean陣列
+          isLike: LikedRestaurantId.includes(r.id)
         }))
         return res.render('restaurants', {
           restaurants: data,
@@ -49,7 +51,8 @@ const restController = {
         Category, // 與category關聯(categoryId在R這)
         { model: Comment, include: User }, // 與Comment關聯，再從Comment關連到User
         // Rid在C那裡，所以要加上{model:C}，關連到C後，C有Uid直接用U即可
-        { model: User, as: 'FavoritedUsers' }
+        { model: User, as: 'FavoritedUsers' }, // 取得關聯得到FavoritedUsers，因只有單一一筆餐廳資料，在這裡設定關聯資料即可，可以不用像restaurants要在passport設定
+        { model: User, as: 'LikedUsers' }
       ]
     })
       .then(restaurant => {
@@ -57,12 +60,13 @@ const restController = {
         return restaurant.increment('viewCounts')
       })
       .then((restaurant) => {
-        console.log('restaurant.FavoritedUsers', restaurant.FavoritedUsers)
         // 因只要查到一筆資料比對即可，所以使用some，也因為使用一筆資料，所以使用User的FavoritedUsers即可比較有效率
         const isFavorite = restaurant.FavoritedUsers.some(f => f.id === req.user.id) // some找到一筆資料即回傳true停止程式
+        const isLike = restaurant.LikedUsers.some(l => l.id === req.user.id)
         res.render('restaurant', {
           restaurant: restaurant.toJSON(),
-          isFavorite
+          isFavorite,
+          isLike
         })
       })
       .catch(err => next(err))
