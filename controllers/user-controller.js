@@ -175,6 +175,25 @@ const userController = {
         res.redirect('back')
       })
       .catch(err => next(err))
+  },
+  topUsers: (req, res, next) => {
+    return User.findAll({
+      include: { model: User, as: 'Followers' } // 取得User關聯Followers資料，撈出follower_id的資料(透過followship的fk:following_id查找的)
+    })
+      .then(users => {
+        users = users.map(user => ({
+          // 展開物件user
+          ...user.toJSON(), // 前面沒有放raw、nest，要加上toJSON整理格式
+
+          // 計算這位物件user有多少個follower_id
+          followerCount: user.Followers.length, // 透過Followers，userId為following_id(FK)，找出對應的follower_id
+
+          // 確認這位登入者user的following_id = 這位物件user.id(確認有無追蹤)
+          isFollowed: req.user.Followings.map(f => f.id === user.id) // 透過Followings，userId為follower_id(FK)，找出對應的following_id，所以才確認登入者user.following_id是否等於這位物件user.id
+        }))
+        return res.render('top-users', { users })
+      })
+      .catch(err => next(err))
   }
 }
 
