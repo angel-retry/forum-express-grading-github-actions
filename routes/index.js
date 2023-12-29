@@ -36,6 +36,9 @@ router.delete('/favorite/:restaurantId', userController.removeFavorite)
 router.post('/like/:restaurantId', authenticated, userController.addLike)
 router.delete('/like/:restaurantId', authenticated, userController.removeLike)
 
+router.post('/following/:userId', authenticated, userController.addFollowing)
+router.delete('/following/:userId', authenticated, userController.removeFollowing)
+
 // 當都沒有匹對的路徑，最後會導向此路由
 router.use('/', (req, res) => res.redirect('/restaurants'))
 // 錯誤訊息要加在最後一行

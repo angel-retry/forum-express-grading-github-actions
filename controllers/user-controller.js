@@ -1,4 +1,4 @@
-const { User, Comment, Restaurant, Favorite, Like } = require('../models')
+const { User, Comment, Restaurant, Favorite, Like, Followship } = require('../models')
 const bcrypt = require('bcryptjs')
 const { localFileHandler } = require('../helpers/file-helpers')
 
@@ -181,17 +181,65 @@ const userController = {
       include: { model: User, as: 'Followers' } // 取得User關聯Followers資料，撈出follower_id的資料(透過followship的fk:following_id查找的)
     })
       .then(users => {
-        users = users.map(user => ({
-          // 展開物件user
-          ...user.toJSON(), // 前面沒有放raw、nest，要加上toJSON整理格式
+        const result = users
+          .map(user => ({
+            // 展開物件user
+            ...user.toJSON(), // 前面沒有放raw、nest，要加上toJSON整理格式
 
-          // 計算這位物件user有多少個follower_id
-          followerCount: user.Followers.length, // 透過Followers，userId為following_id(FK)，找出對應的follower_id
+            // 計算這位物件user有多少個follower_id
+            followerCount: user.Followers.length, // 透過Followers，userId為following_id(FK)，找出對應的follower_id
 
-          // 確認這位登入者user的following_id = 這位物件user.id(確認有無追蹤)
-          isFollowed: req.user.Followings.map(f => f.id === user.id) // 透過Followings，userId為follower_id(FK)，找出對應的following_id，所以才確認登入者user.following_id是否等於這位物件user.id
-        }))
-        return res.render('top-users', { users })
+            // 確認這位登入者user的following_id = 這位物件user.id(確認有無追蹤)
+            isFollowed: req.user.Followings.some(f => f.id === user.id) // 透過Followings，userId為follower_id(FK)，找出對應的following_id，所以才確認登入者user.following_id是否等於這位物件user.id
+          }))
+          // 排序followerCount多寡
+          .sort((a, b) => b.followerCount - a.followerCount) // sort((a,b) => b-a) 排序由大到小
+        return res.render('top-users', { users: result })
+      })
+      .catch(err => next(err))
+  },
+  addFollowing: (req, res, next) => {
+    const userId = req.user.id
+    const followingId = req.params.userId
+    return Promise.all([
+      User.findByPk(followingId),
+      Followship.findOne({
+        where: {
+          followerId: userId,
+          followingId
+        }
+      })
+    ])
+      .then(([user, followship]) => {
+        if (!user) throw new Error('沒有此使用者!')
+        if (followship) throw new Error('已追蹤此使用者!')
+        return Followship.create({
+          followerId: userId,
+          followingId
+        })
+      })
+      .then(() => {
+        req.flash('success_messages', '成功追蹤此使用者!')
+        res.redirect('back')
+      })
+      .catch(err => next(err))
+  },
+  removeFollowing: (req, res, next) => {
+    const userId = req.user.id
+    const followingId = req.params.userId
+    return Followship.findOne({
+      where: {
+        followerId: userId,
+        followingId
+      }
+    })
+      .then(followship => {
+        if (!followship) throw new Error('沒有追蹤此使用者!')
+        return followship.destroy()
+      })
+      .then(() => {
+        req.flash('success_messages', '成功退追使用者!')
+        res.redirect('back')
       })
       .catch(err => next(err))
   }
