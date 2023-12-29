@@ -104,6 +104,25 @@ const restController = {
         res.render('feeds', { restaurants, comments })
       })
       .catch(err => next(err))
+  },
+  getTopRestaurants: (req, res, next) => {
+    return Restaurant.findAll({
+      include: [{
+        model: User, as: 'FavoritedUsers'
+      }]
+    })
+      .then(restaurants => {
+        restaurants = restaurants.map(r => ({
+          ...r.toJSON(),
+          description: r.description.substring(0, 50),
+          favoritedCount: r.FavoritedUsers.length,
+          isFavorited: req.user && req.user.FavoritedRestaurants.map(fr => fr.id).includes(r.id)
+        }))
+          .sort((a, b) => b.favoritedCount - a.favoritedCount) // 排序收藏數多寡
+          .slice(0, 10) // 取得前10筆資料即可
+        res.render('top-restaurants', { restaurants })
+      })
+      .catch(err => next(err))
   }
 }
 
