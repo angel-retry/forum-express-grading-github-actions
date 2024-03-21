@@ -1,4 +1,5 @@
 const { Restaurant } = require('../models')
+const localFileHandler = require('../helpers/file-helpers')
 
 const adminController = {
   getRestaurants: (req, res, next) => {
@@ -13,14 +14,18 @@ const adminController = {
   },
   postRestaurant: (req, res, next) => {
     const { name, tel, address, openingHours, description } = req.body
-    console.log(req.body)
+    console.log('req.body', req.body)
     if (!name || !tel || !address || !openingHours || !description) throw new Error('請把資料都填入!')
-    return Restaurant.create({ name, tel, address, openingHours, description })
-      .then(() => {
-        req.flash('success_messages', '餐廳新增成功!')
-        return res.redirect('/admin/restaurants')
+    const { file } = req
+    localFileHandler(file)
+      .then(filePath => {
+        return Restaurant.create({ name, tel, address, openingHours, description, image: filePath || null })
+          .then(() => {
+            req.flash('success_messages', '餐廳新增成功!')
+            return res.redirect('/admin/restaurants')
+          })
+          .catch(err => next(err))
       })
-      .catch(err => next(err))
   },
   getRestaurant: (req, res, next) => {
     const { id } = req.params
@@ -42,16 +47,20 @@ const adminController = {
     const { id } = req.params
     const { name, tel, address, openingHours, description } = req.body
     if (!name || !tel || !address || !openingHours || !description) throw new Error('請把資料都填入!')
-    return Restaurant.findByPk(id)
-      .then(restaurant => {
-        if (!restaurant) throw new Error('沒有這筆餐廳資料!')
-        return restaurant.update({ name, tel, address, openingHours, description })
+    console.log(req.body)
+    const { file } = req
+    Promise.all([
+      localFileHandler(file),
+      Restaurant.findByPk(id)
+    ])
+      .then(([filePath, restaurant]) => {
+        return restaurant.update({ name, tel, address, openingHours, description, image: filePath || null })
+          .then(() => {
+            req.flash('success', '更新餐廳資料成功!')
+            return res.redirect(`/admin/restaurants/${id}`)
+          })
+          .catch(err => next(err))
       })
-      .then(() => {
-        req.flash('success', '更新餐廳資料成功!')
-        return res.redirect(`/admin/restaurants/${id}`)
-      })
-      .catch(err => next(err))
   },
   deleteRestaurant: (req, res, next) => {
     const { id } = req.params
