@@ -7,6 +7,7 @@ router.get('/restaurants/create', authenticatedAdmin, adminController.createRest
 router.get('/restaurants/:id/edit', authenticatedAdmin, adminController.editRestaurant)
 router.get('/restaurants/:id', authenticatedAdmin, adminController.getRestaurant)
 router.put('/restaurants/:id', authenticatedAdmin, adminController.putRestaurant)
+router.delete('/restaurants/:id', authenticatedAdmin, adminController.deleteRestaurant)
 router.get('/restaurants', authenticatedAdmin, adminController.getRestaurants)
 router.post('/restaurants', authenticatedAdmin, adminController.postRestaurant)
 

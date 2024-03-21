@@ -52,6 +52,19 @@ const adminController = {
         return res.redirect(`/admin/restaurants/${id}`)
       })
       .catch(err => next(err))
+  },
+  deleteRestaurant: (req, res, next) => {
+    const { id } = req.params
+    return Restaurant.findByPk(id)
+      .then(restaurant => {
+        if (!restaurant) throw new Error('沒有這筆餐廳資料!')
+        return restaurant.destroy()
+      })
+      .then(() => {
+        req.flash('success', '刪除餐廳資料成功!')
+        return res.redirect('/admin/restaurants')
+      })
+      .catch(err => next(err))
   }
 }
 
