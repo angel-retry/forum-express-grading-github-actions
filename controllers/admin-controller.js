@@ -7,6 +7,20 @@ const adminController = {
         return res.render('admin/restaurants', { restaurants })
       })
       .catch(err => next(err))
+  },
+  createRestaurant: (req, res, next) => {
+    return res.render('admin/create-restaurants')
+  },
+  postRestaurant: (req, res, next) => {
+    const { name, tel, address, openingHours, description } = req.body
+    console.log(req.body)
+    if (!name || !tel || !address || !openingHours || !description) throw new Error('請把資料都填入!')
+    return Restaurant.create({ name, tel, address, openingHours, description })
+      .then(() => {
+        req.flash('success_messages', '餐廳新增成功!')
+        return res.redirect('/admin/restaurants')
+      })
+      .catch(err => next(err))
   }
 }
 
