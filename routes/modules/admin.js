@@ -9,8 +9,10 @@ router.get('/restaurants/:id/edit', authenticatedAdmin, adminController.editRest
 router.get('/restaurants/:id', authenticatedAdmin, adminController.getRestaurant)
 router.put('/restaurants/:id', upload.single('image'), authenticatedAdmin, adminController.putRestaurant)
 router.delete('/restaurants/:id', authenticatedAdmin, adminController.deleteRestaurant)
+router.patch('/users/:id', authenticatedAdmin, adminController.patchUser)
 router.get('/restaurants', authenticatedAdmin, adminController.getRestaurants)
 router.post('/restaurants', upload.single('image'), authenticatedAdmin, adminController.postRestaurant)
+router.get('/users', authenticatedAdmin, adminController.getUsers)
 
 router.use('/', (req, res) => {
   return res.redirect('/admin/restaurants')
